@@ -40,7 +40,8 @@ troyFunction <- function(cohortDatabaseSchema=cohortDatabaseSchema,
 
     # specificationRct <- read.csv(file.path(getwd(), "inst", "csv", paste0(trial, ".csv")))
     specificationRct <- read.csv(file.path('~/git/Troy/inst/csv/', paste0(trial, ".csv")))
-    colnames(specificationRct) <- c("characteristics", "target", "targetSd", "comparator", "comparatorSd", "tag", "isNa", "targetSize", "comparatorSize", "statistics", "analysisId", "conceptIds", "hasValue", "summary")
+    specificationRct$n <- NA
+    colnames(specificationRct) <- c("characteristics", "target", "targetSd", "comparator", "comparatorSd", "tag", "isNa", "targetSize", "comparatorSize", "statistics", "analysisId", "conceptIds", "hasValue", "summary", "n")
     specificationRct <- subset(specificationRct, specificationRct$isNa != 'Y')
     specificationRct[is.na(specificationRct)]<-""
 
@@ -116,7 +117,10 @@ troyFunction <- function(cohortDatabaseSchema=cohortDatabaseSchema,
             if (nrow(t)==0) {
               t <- 0
               sd <- 0
+              n <- 0
             } else {
+              n <- t$n
+              n <- as.numeric(n)
               t <- t %>% select(specificationRct$statistics[idx])
               t <- as.numeric(t)
               if(specificationRct$statistics[idx]=="median") {
@@ -129,6 +133,7 @@ troyFunction <- function(cohortDatabaseSchema=cohortDatabaseSchema,
                 sd <- (paste0(sd[2], "–", sd[5]))} else {sd <- data.frame(statisticsPooled %>% filter(covariateId %in% maxCovariateId))[, c("sd")]}}
           } else {
             t <- data.frame(statisticsPooled %>% filter(covariateId %in% covariateIds))[,c(specificationRct$statistics[idx])]
+            n <- data.frame(statisticsPooled %>% filter(covariateId %in% covariateIds))[,c("n")]
             if(specificationRct$statistics[idx]=="median"){
               sd <- summary(
                 data.frame(
@@ -150,6 +155,7 @@ troyFunction <- function(cohortDatabaseSchema=cohortDatabaseSchema,
                               filter(.data$covariateId %in% covariateIds) %>%
                               summarise(n = n_distinct(.data$rowId)))
             t <- as.numeric(t)
+            n <- as.numeric(t)
             sd <- (t / sizeOE[sizeOE[,"treatment"] < 0,"n"]) * 100
           } else {
             #if (nchar(covariateIds) > 3) {
@@ -198,8 +204,10 @@ troyFunction <- function(cohortDatabaseSchema=cohortDatabaseSchema,
         # df2 <- rbind(df2, sd)
         specificationRct$pooledTroy[idx] <- t
         specificationRct$pooledTroySd[idx] <- sd
+        specificationRct$n[idx] <- n
         t <- NA
         sd <- NA
+        n <- NA
       }
       # specificationRct$pooledTroy <- df[,1]
       # specificationRct$pooledTroySd <- df2[,1]
@@ -212,7 +220,7 @@ troyFunction <- function(cohortDatabaseSchema=cohortDatabaseSchema,
 
 
       output <- read.csv(file.path('~/git/Troy/inst/csv/', paste0(trial, ".csv")))
-      output <- output %>% left_join(select(specificationRct, characteristics, pooledTroy, pooledTroySd), by = c('characteristics'='characteristics'))
+      output <- output %>% left_join(select(specificationRct, characteristics, pooledTroy, pooledTroySd, n), by = c('characteristics'='characteristics'))
 
       if(z == 1){
         outputCsvSimple <- file.path(outputFolder, paste0(trial, "TroyCriteriaSimple.csv"))
