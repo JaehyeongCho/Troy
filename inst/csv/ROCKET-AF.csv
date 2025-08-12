@@ -2,7 +2,7 @@
 "Age median","73","","73","","Demographics","","7131","7133","median","2","1","","Y",NA
 "Age IQR","65-78","","65-78","","Demographics","","","","IQR","2","1","","",NA
 "Female sex","2831","","2832","","Demographics","","","","n","1","8532","","",NA
-"BMI median","28.3","","28.1","","Demographics","","","","median","705","40762636","","Y",NA
+"BMI median","28.3","","28.1","","Demographics","","","","median","705","40762636;3038553","","Y",NA
 "BMI IQR","25.2-32.1","","25.1-31.8","","Demographics","","","","IQR","705","40762636","","",NA
 "Blood pressure systolic median","130","","130","","Blood pressure  mm Hg","","","","median","705","3004249","","Y",121
 "Blood pressure systolic IQR","120-140","","120-140","","Blood pressure  mm Hg","","","","IQR","705","3004249","","",121
